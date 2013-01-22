@@ -21,6 +21,7 @@ std::vector<std::vector<bool> > result;
 
 void output_function(const char* s) {
   fprintf(stderr, s);
+  fflush(stderr);
 }
 
 int main(int argc, char** argv)

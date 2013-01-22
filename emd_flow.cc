@@ -31,7 +31,7 @@ void emd_flow(
     void (*output_function)(const char*),
     bool verbose) {
 
-  const int kOutputBufferSize = 0;
+  const int kOutputBufferSize = 1000;
   char output_buffer[kOutputBufferSize];
 
   // number of rows
@@ -198,7 +198,10 @@ void emd_flow(
     output_function(output_buffer);
   }
 
+  result->clear();
+  result->resize(r);
   for (int ii = 0; ii < r; ++ii) {
+    (*result)[ii].resize(c);
     for (int jj = 0; jj < c; ++jj) {
       (*result)[ii][jj] = (alg.flow(nodearcs[ii][jj]) > 0);
     }
