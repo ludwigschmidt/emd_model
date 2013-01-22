@@ -11,17 +11,29 @@ void output_function(const char* s) {
 }
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
-  if (nrhs != 3) {
-    mexErrMsgTxt("Three input argument required (amplitudes, sparsity, EMD "
-        "budget.");
+  if (nrhs < 3) {
+    mexErrMsgTxt("At least three input argument required (amplitudes, sparsity,"
+        " EMD budget.");
+  }
+
+  int numdims = 0;
+  const mwSize* dims;
+  
+  bool verbose = false;
+  if (nrhs == 4) {
+    numdims = mxGetNumberOfDimensions(prhs[3]);
+    dims = mxGetDimensions(prhs[3]);
+    if (numdims != 2 || dims[0] != 1 || dims[1] != 1) {
+      mexErrMsgTxt("Verbose flag has to be a scalar.");
+    }
+    verbose = static_cast<bool*>(mxGetData(prhs[3]))[0];
   }
   
   if (nlhs > 4) {
     mexErrMsgTxt("Too many output arguments.");
   }
 
-  int numdims = 0, r = 0, c = 0;
-  const mwSize* dims;
+  int r = 0, c = 0;
 
   numdims = mxGetNumberOfDimensions(prhs[0]);
   dims = mxGetDimensions(prhs[0]);
@@ -60,7 +72,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   double final_lambda;
 
   emd_flow(a, k, emd_budget, &result, &emd_cost, &amp_sum, &final_lambda,
-      output_function, true);
+      output_function, verbose);
 
   if (nlhs >= 1) {
     numdims = mxGetNumberOfDimensions(prhs[0]);
