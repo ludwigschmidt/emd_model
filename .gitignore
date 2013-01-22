@@ -2,3 +2,5 @@
 *.swm
 *.swo
 *.swn
+*.o
+emd_flow
