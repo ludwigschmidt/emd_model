@@ -2,8 +2,13 @@
 #include <math.h>
 #include <matrix.h>
 #include <mex.h>
+#include "emd_flow.h"
 
 using namespace std;
+
+void output_function(const char* s) {
+  mexPrintf(s);
+}
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   if (nrhs != 3) {
@@ -48,6 +53,43 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     mexErrMsgTxt("EMD budget has to be a scalar.");
   }
   int emd_budget = mxGetPr(prhs[2])[0];
+
+  vector<vector<bool> > result;
+  int emd_cost;
+  double amp_sum;
+  double final_lambda;
+
+  emd_flow(a, k, emd_budget, &result, &emd_cost, &amp_sum, &final_lambda,
+      output_function, true);
+
+  if (nlhs >= 1) {
+    numdims = mxGetNumberOfDimensions(prhs[0]);
+    dims = mxGetDimensions(prhs[0]);
+    plhs[0] = mxCreateNumericArray(numdims, dims, mxUINT8_CLASS, mxREAL);
+    unsigned char* result_linear = static_cast<unsigned char*>(
+        mxGetData(plhs[0]));
+
+    for (int ir = 0; ir < r; ++ir) {
+      for (int ic = 0; ic < c; ++ic) {
+        result_linear[ir + ic * r] = result[ir][ic];
+      }
+    }
+  }
+
+  if (nlhs >= 2) {
+    plhs[1] = mxCreateDoubleMatrix(1, 1, mxREAL);
+    *(mxGetPr(plhs[1])) = emd_cost;
+  }
+
+  if (nlhs >= 3) {
+    plhs[2] = mxCreateDoubleMatrix(1, 1, mxREAL);
+    *(mxGetPr(plhs[2])) = amp_sum;
+  }
+
+  if (nlhs >= 4) {
+    plhs[3] = mxCreateDoubleMatrix(1, 1, mxREAL);
+    *(mxGetPr(plhs[3])) = final_lambda;
+  }
 
   /*
   mexPrintf("r = %d, c = %d, k = %d, EMD budget = %d\n", r, c, k, emd_budget);
