@@ -5,3 +5,6 @@
 *.o
 emd_flow
 *.mexa64
+flow_algo/lemon/lib
+flow_algo/lemon/bin
+flow_algo/lemon/include
