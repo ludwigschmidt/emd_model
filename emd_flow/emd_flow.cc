@@ -2,6 +2,7 @@
 #include <cmath>
 #include <cstdio>
 #include <lemon/list_graph.h>
+#include <lemon/maps.h>
 #include <lemon/capacity_scaling.h>
 
 using namespace lemon;
