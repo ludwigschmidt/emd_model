@@ -61,10 +61,11 @@ void emd_flow(
   while (true) {
     network.run_flow(lambda_high);
     int cur_emd_cost = network.get_EMD_used();
+    double cur_amp_sum = network.get_supported_amplitude_sum();
 
     if (verbose) {
-      snprintf(output_buffer, kOutputBufferSize, "l: %lf  emd: %d\n",
-          lambda_high, cur_emd_cost);
+      snprintf(output_buffer, kOutputBufferSize, "l: %lf  EMD: %d  amp sum: %lf"
+          "\n", lambda_high, cur_emd_cost, cur_amp_sum);
       output_function(output_buffer);
     }
 
@@ -87,11 +88,12 @@ void emd_flow(
     double cur_lambda = (lambda_high + lambda_low) / 2;
     network.run_flow(cur_lambda);
     int cur_emd_cost = network.get_EMD_used();
+    double cur_amp_sum = network.get_supported_amplitude_sum();
 
     if (verbose) {
       snprintf(output_buffer, kOutputBufferSize, "l_cur: %lf  (l_low: %lf, "
-          "l_high: %lf)  emd: %d\n", cur_lambda, lambda_low, lambda_high,
-          cur_emd_cost);
+          "l_high: %lf)  EMD: %d  amp sum: %lf\n", cur_lambda, lambda_low,
+          lambda_high, cur_emd_cost, cur_amp_sum);
       output_function(output_buffer);
     }
 
