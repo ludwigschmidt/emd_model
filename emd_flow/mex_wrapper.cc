@@ -41,6 +41,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   if (numdims != 2) {
     mexErrMsgTxt("Amplitudes need to be a two-dimensional array.");
   }
+  if (!mxIsClass(prhs[0], "double")) {
+    mexErrMsgTxt("Amplitudes need to be a double array.");
+  }
   r = dims[0];
   c = dims[1];
   double* a_linear = mxGetPr(prhs[0]);
