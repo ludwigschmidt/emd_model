@@ -7,7 +7,7 @@ emd_flow.o: emd_flow.cc emd_flow.h emd_flow_network.h
 emd_flow_network.o: emd_flow_network.cc emd_flow_network.h
 	g++ -Wall -Wextra -fPIC -O2 -c -o emd_flow_network.o emd_flow_network.cc -lemon -I lemon/include -L lemon/lib
 
-mexfile: emd_flow.o emd_flow.h mex_wrapper.cc
+mexfile: emd_flow.o emd_flow_network.o emd_flow.h mex_wrapper.cc
 	mex -output emd_flow mex_wrapper.cc emd_flow.o emd_flow_network.o
 
 all: emd_flow mexfile
