@@ -10,6 +10,9 @@ emd_flow_network.o: emd_flow_network.cc emd_flow_network.h
 mexfile: emd_flow.o emd_flow_network.o emd_flow.h mex_wrapper.cc
 	mex -output emd_flow mex_wrapper.cc emd_flow.o emd_flow_network.o
 
+emd_flow_lambda_mexwrapper: emd_flow_network.o emd_flow_lambda_mexwrapper.cc
+	mex -output emd_flow_lambda emd_flow_lambda_mexwrapper.cc emd_flow_network.o -Ilemon/include
+
 all: emd_flow mexfile
 
 clean:
