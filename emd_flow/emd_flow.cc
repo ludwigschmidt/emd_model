@@ -2,10 +2,11 @@
 #include <cmath>
 #include <cstdio>
 #include <ctime>
+#include <memory>
 
 #include "emd_flow_network.h"
+#include "emd_flow_network_factory.h"
 
-using namespace lemon;
 using namespace std;
 
 void emd_flow(
@@ -16,6 +17,7 @@ void emd_flow(
     int* emd_cost,
     double* amp_sum,
     double* final_lambda,
+    EMDFlowNetworkFactory::EMDFlowNetworkType alg_type,
     void (*output_function)(const char*),
     bool verbose) {
 
@@ -36,13 +38,15 @@ void emd_flow(
   // build graph
   clock_t graph_construction_time_begin = clock();
 
-  EMDFlowNetwork network(a, k);
+  unique_ptr<EMDFlowNetwork> network =
+      EMDFlowNetworkFactory::create_EMD_flow_network(a, alg_type);
+  network->set_sparsity(k);
 
   clock_t graph_construction_time = clock() - graph_construction_time_begin;
 
   if (verbose) {
     snprintf(output_buffer, kOutputBufferSize, "The graph has %d nodes and %d "
-        "edges.\n", network.get_num_nodes(), network.get_num_edges());
+        "edges.\n", network->get_num_nodes(), network->get_num_edges());
     output_function(output_buffer);
     snprintf(output_buffer, kOutputBufferSize, "Total construction time: %lf "
         "s\n ", static_cast<double>(graph_construction_time) / CLOCKS_PER_SEC);
@@ -59,9 +63,9 @@ void emd_flow(
 
   double lambda_high = 0.01;
   while (true) {
-    network.run_flow(lambda_high);
-    int cur_emd_cost = network.get_EMD_used();
-    double cur_amp_sum = network.get_supported_amplitude_sum();
+    network->run_flow(lambda_high);
+    int cur_emd_cost = network->get_EMD_used();
+    double cur_amp_sum = network->get_supported_amplitude_sum();
 
     if (verbose) {
       snprintf(output_buffer, kOutputBufferSize, "l: %lf  EMD: %d  amp sum: %lf"
@@ -86,9 +90,9 @@ void emd_flow(
   double lambda_eps = 0.00001;
   while(lambda_high - lambda_low > lambda_eps) {
     double cur_lambda = (lambda_high + lambda_low) / 2;
-    network.run_flow(cur_lambda);
-    int cur_emd_cost = network.get_EMD_used();
-    double cur_amp_sum = network.get_supported_amplitude_sum();
+    network->run_flow(cur_lambda);
+    int cur_emd_cost = network->get_EMD_used();
+    double cur_amp_sum = network->get_supported_amplitude_sum();
 
     if (verbose) {
       snprintf(output_buffer, kOutputBufferSize, "l_cur: %lf  (l_low: %lf, "
@@ -105,11 +109,11 @@ void emd_flow(
   }
 
   // run with final lambda
-  network.run_flow(lambda_high);
-  *emd_cost = network.get_EMD_used();
-  *amp_sum = network.get_supported_amplitude_sum();
+  network->run_flow(lambda_high);
+  *emd_cost = network->get_EMD_used();
+  *amp_sum = network->get_supported_amplitude_sum();
   *final_lambda = lambda_high;
-  network.get_support(result);
+  network->get_support(result);
 
   if (verbose) {
     snprintf(output_buffer, kOutputBufferSize, "Final l: %lf, amp sum: %lf, "

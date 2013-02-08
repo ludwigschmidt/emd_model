@@ -4,6 +4,7 @@
 #include <boost/program_options.hpp>
 
 #include "emd_flow.h"
+#include "emd_flow_network_factory.h"
 
 using namespace std;
 namespace po = boost::program_options;
@@ -26,10 +27,14 @@ void output_function(const char* s) {
 
 int main(int argc, char** argv)
 {
+  string alg_name;
+
   po::options_description desc("Allowed options");
   desc.add_options()
       ("matrix_output", po::value<string>(), "File for binary output matrix")
-      ("square_amplitudes", "Square all input amplitudes");
+      ("square_amplitudes", "Square all input amplitudes")
+      ("algorithm", po::value<string>(&alg_name)->default_value(
+          "lemon-capacityscaling"), "Min-cost max-flow algorithm");
   po::variables_map vm;
   po::store(po::parse_command_line(argc, argv, desc), vm);
   po::notify(vm); 
@@ -54,23 +59,31 @@ int main(int argc, char** argv)
     }
   }
 
+  EMDFlowNetworkFactory::EMDFlowNetworkType alg_type =
+      EMDFlowNetworkFactory::parse_type(alg_name);
+
+  if (alg_type == EMDFlowNetworkFactory::kUnknownType) {
+    fprintf(stderr, "Unknown algorithm \"%s\", exiting.\n", alg_name.c_str());
+    return 0;
+  }
+
   
   int emd_cost = 0;
   double amp_sum = 0.0;
   double final_lambda = 0.0;
   emd_flow(a, k, emd_bound, &result, &emd_cost, &amp_sum, &final_lambda,
-      output_function, true);
+      alg_type, output_function, true);
 
   for (int jj = 0; jj < c; ++jj) {
     fprintf(stderr, "col %d:\n", jj + 1);
     for (int ii = 0; ii < r; ++ii) {
       if (result[ii][jj]) {
-        fprintf(stderr, " row %d, amplitude %lf\n", ii + 1, a[ii][jj]);
+        fprintf(stderr, " row %d, amplitude %f\n", ii + 1, a[ii][jj]);
       }
     }
   }
 
-  printf("%lf\n", amp_sum);
+  printf("%f\n", amp_sum);
 
   if (vm.count("matrix_output")) {
     string output_file_name = vm["matrix_output"].as<string>();

@@ -3,6 +3,8 @@
 
 #include <vector>
 
+#include "emd_flow_network_factory.h"
+
 void emd_flow(
     const std::vector<std::vector<double> >& a,
     int k,
@@ -11,6 +13,7 @@ void emd_flow(
     int* emd_cost,
     double* amp_sum,
     double* final_lambda,
+    EMDFlowNetworkFactory::EMDFlowNetworkType alg_type,
     void (*output_function)(const char*),
     bool verbose);
 
