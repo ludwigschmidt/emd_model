@@ -1,6 +1,7 @@
 #include "emd_flow_network_factory.h"
 #include "emd_flow_network.h"
 #include "emd_flow_network_lemon.h"
+#include "emd_flow_network_sap.h"
 
 #include <memory>
 
@@ -25,6 +26,8 @@ unique_ptr<EMDFlowNetwork> EMDFlowNetworkFactory::create_EMD_flow_network(
     return unique_ptr<EMDFlowNetwork>(
         new EMDFlowNetworkLemon<CapacityScaling<ListDigraph, int, double> >(
             amplitudes));
+  } else if (type == kShortestAugmentingPath) {
+    return unique_ptr<EMDFlowNetwork>(new EMDFlowNetworkSAP(amplitudes));
   } else {
     return unique_ptr<EMDFlowNetwork>();
   }
@@ -38,6 +41,8 @@ EMDFlowNetworkFactory::EMDFlowNetworkType EMDFlowNetworkFactory::parse_type(
     return kLemonNetworkSimplex;
   } else if (name == "lemon-capacityscaling") {
     return kLemonCapacityScaling;
+  } else if (name == "sap" || name == "shortest-augmenting-path") {
+    return kShortestAugmentingPath;
   } else {
     return kUnknownType;
   }

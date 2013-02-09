@@ -12,6 +12,7 @@ class EMDFlowNetworkFactory {
     kLemonCostScaling,
     kLemonNetworkSimplex,
     kLemonCapacityScaling,
+    kShortestAugmentingPath,
     kUnknownType,
   };
 
