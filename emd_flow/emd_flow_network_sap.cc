@@ -247,7 +247,6 @@ void EMDFlowNetworkSAP::run_flow(double lambda) {
       NodeIndex cur_node = top.second;
       visited[cur_node] = true;
       ++num_found;
-      //printf("  found path to %lu, dst = %f\n", top.second, top.first);
 
       NodeIndex next_node;
       for (vector<EdgeIndex>::iterator iter = outgoing_edges_[cur_node].begin();
