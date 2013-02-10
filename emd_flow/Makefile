@@ -10,8 +10,8 @@ emd_flow_network_factory.o: emd_flow_network_factory.cc emd_flow_network_factory
 emd_flow_network_sap.o: emd_flow_network_sap.cc emd_flow_network_sap.h emd_flow_network.h
 	g++ -Wall -Wextra -pedantic -std=c++0x -fPIC -O2 -g -c -o emd_flow_network_sap.o emd_flow_network_sap.cc
 
-mexfile: emd_flow.o emd_flow_network.o emd_flow.h mex_wrapper.cc
-	mex -output emd_flow mex_wrapper.cc emd_flow.o emd_flow_network.o
+mexfile: emd_flow.o emd_flow_network_factory.o emd_flow_network_sap.o emd_flow.h emd_flow_network_factory.h mex_wrapper.cc mex_helper.h
+	mex -v CXXFLAGS="\$$CXXFLAGS -Wall -Wextra -pedantic -std=c++0x" -output emd_flow mex_wrapper.cc emd_flow.o emd_flow_network_sap.o emd_flow_network_factory.o
 
 emd_flow_lambda_mexwrapper: emd_flow_network.o emd_flow_lambda_mexwrapper.cc
 	mex -output emd_flow_lambda emd_flow_lambda_mexwrapper.cc emd_flow_network.o -Ilemon/include

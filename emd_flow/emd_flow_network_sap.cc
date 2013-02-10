@@ -11,7 +11,9 @@
 using namespace std;
 
 EMDFlowNetworkSAP::EMDFlowNetworkSAP(
-    const std::vector<std::vector<double> >& amplitudes) : a_(amplitudes) {
+    const std::vector<std::vector<double> >& amplitudes) : a_(amplitudes),
+    total_inner_iterations(0), checking_inner_iterations(0),
+    updating_inner_iterations(0) {
   r_ = amplitudes.size();
   c_ = amplitudes[0].size();
 
