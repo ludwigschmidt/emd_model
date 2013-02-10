@@ -2,6 +2,7 @@
 #define __EMD_FLOW_NETWORK_H__
 
 #include <vector>
+#include <string>
 
 class EMDFlowNetwork {
  public:
@@ -15,6 +16,7 @@ class EMDFlowNetwork {
   virtual int get_num_edges() = 0;
   virtual int get_num_columns() = 0;
   virtual int get_num_rows() = 0;
+  virtual void get_performance_diagnostics(std::string* s) { *s = "";}
   virtual ~EMDFlowNetwork() { }
 };
 

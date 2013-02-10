@@ -34,7 +34,8 @@ int main(int argc, char** argv)
       ("matrix_output", po::value<string>(), "File for binary output matrix")
       ("square_amplitudes", "Square all input amplitudes")
       ("algorithm", po::value<string>(&alg_name)->default_value(
-          "lemon-capacityscaling"), "Min-cost max-flow algorithm");
+          "shortest-augmenting-path"), "Min-cost max-flow algorithm")
+      ("print_support", po::value<string>(), "Print support to stderr");
   po::variables_map vm;
   po::store(po::parse_command_line(argc, argv, desc), vm);
   po::notify(vm); 
@@ -74,11 +75,13 @@ int main(int argc, char** argv)
   emd_flow(a, k, emd_bound, &result, &emd_cost, &amp_sum, &final_lambda,
       alg_type, output_function, true);
 
-  for (int jj = 0; jj < c; ++jj) {
-    fprintf(stderr, "col %d:\n", jj + 1);
-    for (int ii = 0; ii < r; ++ii) {
-      if (result[ii][jj]) {
-        fprintf(stderr, " row %d, amplitude %f\n", ii + 1, a[ii][jj]);
+  if (vm.count("print_support")) {
+    for (int jj = 0; jj < c; ++jj) {
+      fprintf(stderr, "col %d:\n", jj + 1);
+      for (int ii = 0; ii < r; ++ii) {
+        if (result[ii][jj]) {
+          fprintf(stderr, " row %d, amplitude %f\n", ii + 1, a[ii][jj]);
+        }
       }
     }
   }

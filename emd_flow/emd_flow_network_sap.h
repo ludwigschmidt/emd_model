@@ -18,6 +18,7 @@ class EMDFlowNetworkSAP : public EMDFlowNetwork {
   int get_num_edges();
   int get_num_columns();
   int get_num_rows();
+  void get_performance_diagnostics(std::string* s);
   ~EMDFlowNetworkSAP() { }
 
  private:
@@ -33,12 +34,10 @@ class EMDFlowNetworkSAP : public EMDFlowNetwork {
     NodeIndex to;
     int capacity;
     double cost;
-    bool is_forward;
     EdgeIndex opposite;
 
-    Edge(NodeIndex _to, int _capacity, double _cost, bool _is_forward,
-        EdgeIndex _opposite) : to(_to), capacity(_capacity), cost(_cost),
-        is_forward(_is_forward), opposite(_opposite) { }
+    Edge(NodeIndex _to, int _capacity, double _cost, EdgeIndex _opposite)
+        : to(_to), capacity(_capacity), cost(_cost), opposite(_opposite) { }
   };
 
   // amplitudes
@@ -65,6 +64,10 @@ class EMDFlowNetworkSAP : public EMDFlowNetwork {
   // node potentials
   std::vector<double> potential_;
 
+  long long total_inner_iterations;
+  long long checking_inner_iterations;
+  long long updating_inner_iterations;
+
   NodeIndex innode_index(int r, int c) {
     return 2 + 2 * (c * r_ + r);
   }
@@ -72,6 +75,11 @@ class EMDFlowNetworkSAP : public EMDFlowNetwork {
   NodeIndex outnode_index(int r, int c) {
     return innode_index(r, c) + 1;
   }
+
+  void apply_lambda(double lambda);
+  void reset_flow();
+  void compute_initial_potential();
+  void print_full_graph();
 };
 
 

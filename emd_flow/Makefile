@@ -8,7 +8,7 @@ emd_flow_network_factory.o: emd_flow_network_factory.cc emd_flow_network_factory
 	g++ -Wall -Wextra -pedantic -std=c++0x -fPIC -O2 -c -o emd_flow_network_factory.o emd_flow_network_factory.cc -I lemon/include
 
 emd_flow_network_sap.o: emd_flow_network_sap.cc emd_flow_network_sap.h emd_flow_network.h
-	g++ -Wall -Wextra -pedantic -std=c++0x -fPIC -g -c -o emd_flow_network_sap.o emd_flow_network_sap.cc
+	g++ -Wall -Wextra -pedantic -std=c++0x -fPIC -O2 -g -c -o emd_flow_network_sap.o emd_flow_network_sap.cc
 
 mexfile: emd_flow.o emd_flow_network.o emd_flow.h mex_wrapper.cc
 	mex -output emd_flow mex_wrapper.cc emd_flow.o emd_flow_network.o

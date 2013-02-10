@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <ctime>
 #include <memory>
+#include <string>
 
 #include "emd_flow_network.h"
 #include "emd_flow_network_factory.h"
@@ -48,7 +49,7 @@ void emd_flow(
     snprintf(output_buffer, kOutputBufferSize, "The graph has %d nodes and %d "
         "edges.\n", network->get_num_nodes(), network->get_num_edges());
     output_function(output_buffer);
-    snprintf(output_buffer, kOutputBufferSize, "Total construction time: %lf "
+    snprintf(output_buffer, kOutputBufferSize, "Total construction time: %f "
         "s\n ", static_cast<double>(graph_construction_time) / CLOCKS_PER_SEC);
     output_function(output_buffer);
 
@@ -68,7 +69,7 @@ void emd_flow(
     double cur_amp_sum = network->get_supported_amplitude_sum();
 
     if (verbose) {
-      snprintf(output_buffer, kOutputBufferSize, "l: %lf  EMD: %d  amp sum: %lf"
+      snprintf(output_buffer, kOutputBufferSize, "l: %f  EMD: %d  amp sum: %f"
           "\n", lambda_high, cur_emd_cost, cur_amp_sum);
       output_function(output_buffer);
     }
@@ -95,8 +96,8 @@ void emd_flow(
     double cur_amp_sum = network->get_supported_amplitude_sum();
 
     if (verbose) {
-      snprintf(output_buffer, kOutputBufferSize, "l_cur: %lf  (l_low: %lf, "
-          "l_high: %lf)  EMD: %d  amp sum: %lf\n", cur_lambda, lambda_low,
+      snprintf(output_buffer, kOutputBufferSize, "l_cur: %f  (l_low: %f, "
+          "l_high: %f)  EMD: %d  amp sum: %f\n", cur_lambda, lambda_low,
           lambda_high, cur_emd_cost, cur_amp_sum);
       output_function(output_buffer);
     }
@@ -116,7 +117,7 @@ void emd_flow(
   network->get_support(result);
 
   if (verbose) {
-    snprintf(output_buffer, kOutputBufferSize, "Final l: %lf, amp sum: %lf, "
+    snprintf(output_buffer, kOutputBufferSize, "Final l: %f, amp sum: %f, "
         "EMD cost: %d\n", lambda_high, *amp_sum, *emd_cost);
     output_function(output_buffer);
   }
@@ -124,8 +125,14 @@ void emd_flow(
 
   clock_t total_time = clock() - total_time_begin;
   if (verbose) {
-    snprintf(output_buffer, kOutputBufferSize, "Total time %lf s\n",
+    snprintf(output_buffer, kOutputBufferSize, "Total time %f s\n",
         static_cast<double>(total_time) / CLOCKS_PER_SEC);
+    output_function(output_buffer);
+
+    string performance_diagnostics;
+    network->get_performance_diagnostics(&performance_diagnostics);
+    snprintf(output_buffer, kOutputBufferSize, "Performance diagnostics:\n%s\n",
+        performance_diagnostics.c_str());
     output_function(output_buffer);
   }
 
