@@ -46,7 +46,7 @@ void emd_flow(
   // build graph
   clock_t graph_construction_time_begin = clock();
 
-  unique_ptr<EMDFlowNetwork> network =
+  auto_ptr<EMDFlowNetwork> network =
       EMDFlowNetworkFactory::create_EMD_flow_network(a, alg_type);
   network->set_sparsity(k);
 

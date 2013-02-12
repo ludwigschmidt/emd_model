@@ -12,24 +12,24 @@
 using namespace std;
 using namespace lemon;
 
-unique_ptr<EMDFlowNetwork> EMDFlowNetworkFactory::create_EMD_flow_network(
+auto_ptr<EMDFlowNetwork> EMDFlowNetworkFactory::create_EMD_flow_network(
         const vector<vector<double> >& amplitudes, EMDFlowNetworkType type) {
   if (type == kLemonCostScaling) {
-    return unique_ptr<EMDFlowNetwork>(
+    return auto_ptr<EMDFlowNetwork>(
         new EMDFlowNetworkLemon<CostScaling<ListDigraph, int, double> >(
             amplitudes));
   } else if (type == kLemonNetworkSimplex) {
-    return unique_ptr<EMDFlowNetwork>(
+    return auto_ptr<EMDFlowNetwork>(
         new EMDFlowNetworkLemon<NetworkSimplex<ListDigraph, int, double> >(
             amplitudes));
   } else if (type == kLemonCapacityScaling) {
-    return unique_ptr<EMDFlowNetwork>(
+    return auto_ptr<EMDFlowNetwork>(
         new EMDFlowNetworkLemon<CapacityScaling<ListDigraph, int, double> >(
             amplitudes));
   } else if (type == kShortestAugmentingPath) {
-    return unique_ptr<EMDFlowNetwork>(new EMDFlowNetworkSAP(amplitudes));
+    return auto_ptr<EMDFlowNetwork>(new EMDFlowNetworkSAP(amplitudes));
   } else {
-    return unique_ptr<EMDFlowNetwork>();
+    return auto_ptr<EMDFlowNetwork>();
   }
 }
 

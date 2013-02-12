@@ -3,8 +3,8 @@
 
 #include "emd_flow_network.h"
 
-#include <memory>
 #include <string>
+#include <memory>
 
 class EMDFlowNetworkFactory {
  public:
@@ -13,10 +13,10 @@ class EMDFlowNetworkFactory {
     kLemonNetworkSimplex,
     kLemonCapacityScaling,
     kShortestAugmentingPath,
-    kUnknownType,
+    kUnknownType
   };
 
-  static std::unique_ptr<EMDFlowNetwork> create_EMD_flow_network(
+  static std::auto_ptr<EMDFlowNetwork> create_EMD_flow_network(
       const std::vector<std::vector<double> >& amplitudes,
       EMDFlowNetworkType type);
 
