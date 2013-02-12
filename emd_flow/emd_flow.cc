@@ -13,7 +13,10 @@ using namespace std;
 void emd_flow(
     const vector<vector<double> >& a,
     int k,
-    int emd_bound,
+    int emd_bound_low,
+    int emd_bound_high,
+    double lambda_high,
+    double lambda_eps,
     vector<vector<bool> >* result,
     int* emd_cost,
     double* amp_sum,
@@ -32,7 +35,11 @@ void emd_flow(
 
   if (verbose) {
     snprintf(output_buffer, kOutputBufferSize, "r = %d,  c = %d,  k = %d,  "
-        "emd_bound = %d\n", r, c, k, emd_bound);
+        "emd_bound_low = %d, emd_bound_high = %d\n", r, c, k, emd_bound_low,
+        emd_bound_high);
+    output_function(output_buffer);
+    snprintf(output_buffer, kOutputBufferSize, "lambda_high = %f, "
+        "lambda_eps = %f\n", lambda_high, lambda_eps);
     output_function(output_buffer);
   }
 
@@ -62,10 +69,10 @@ void emd_flow(
     output_function(output_buffer);
   }
 
-  double lambda_high = 0.01;
+  int cur_emd_cost = 0;
   while (true) {
     network->run_flow(lambda_high);
-    int cur_emd_cost = network->get_EMD_used();
+    cur_emd_cost = network->get_EMD_used();
     double cur_amp_sum = network->get_supported_amplitude_sum();
 
     if (verbose) {
@@ -74,7 +81,7 @@ void emd_flow(
       output_function(output_buffer);
     }
 
-    if (cur_emd_cost <= emd_bound) {
+    if (cur_emd_cost <= emd_bound_high) {
       break;
     } else {
       lambda_high = lambda_high * 2;
@@ -88,11 +95,11 @@ void emd_flow(
   }
 
   double lambda_low = 0;
-  double lambda_eps = 0.00001;
-  while(lambda_high - lambda_low > lambda_eps) {
+  while(lambda_high - lambda_low > lambda_eps
+      && (cur_emd_cost < emd_bound_low || cur_emd_cost > emd_bound_high)) {
     double cur_lambda = (lambda_high + lambda_low) / 2;
     network->run_flow(cur_lambda);
-    int cur_emd_cost = network->get_EMD_used();
+    cur_emd_cost = network->get_EMD_used();
     double cur_amp_sum = network->get_supported_amplitude_sum();
 
     if (verbose) {
@@ -102,7 +109,7 @@ void emd_flow(
       output_function(output_buffer);
     }
 
-    if (cur_emd_cost <= emd_bound) {
+    if (cur_emd_cost <= emd_bound_high) {
       lambda_high = cur_lambda;
     } else {
       lambda_low = cur_lambda;

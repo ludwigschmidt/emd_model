@@ -1,4 +1,7 @@
 #include <vector>
+#include <string>
+#include <set>
+#include <sstream>
 
 #include <math.h>
 #include <matrix.h>
@@ -34,26 +37,64 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     mexErrMsgTxt("Sparsity has to be a double scalar.");
   }
 
-  int emd_budget = 0;
-  if (!get_double_as_int(prhs[2], &emd_budget)) {
-    mexErrMsgTxt("EMD budget has to be a double scalar.");
+  int emd_bound_low = 0;
+  int emd_bound_high = 0;
+  if (!get_double_as_int(prhs[2], &emd_bound_low)) {
+    if (!get_double_interval_as_ints(prhs[2], &emd_bound_low,
+        &emd_bound_high)) {
+      mexErrMsgTxt("EMD budget has to be a double scalar or a double "
+          "interval.");
+    }
+  } else {
+    emd_bound_high = emd_bound_low;
   }
 
+  // optional parameters
   bool verbose = false;
+  double lambda_high = 1.0;
+  double lambda_eps = 0.0001;
   if (nrhs == 4) {
-    if (!get_bool(prhs[3], &verbose)) {
-      mexErrMsgTxt("Verbose flag has to be a boolean scalar.");
+    set<string> known_options;
+    known_options.insert("verbose");
+    known_options.insert("lambda_high");
+    known_options.insert("lambda_eps");
+    vector<string> options;
+    if (!get_fields(prhs[3], &options)) {
+      mexErrMsgTxt("Cannot get fields from options argument.");
     }
- 
- }
+    for (size_t ii = 0; ii < options.size(); ++ii) {
+      if (known_options.find(options[ii]) == known_options.end()) {
+        ostringstream ss;
+        ss << "Unknown option \"" << options[ii].c_str() << "\"";
+        string msg = ss.str();
+        mexErrMsgTxt(msg.c_str());
+      }
+    }
+
+    if (has_field(prhs[3], "verbose")
+        && !get_bool_field(prhs[3], "verbose", &verbose)) {
+      mexErrMsgTxt("verbose flag has to be a boolean scalar.");
+    }
+
+    if (has_field(prhs[3], "lambda_high")
+        && !get_double_field(prhs[3], "lambda_high", &lambda_high)) {
+      mexErrMsgTxt("lambda_high flag has to be a boolean scalar.");
+    }
+
+    if (has_field(prhs[3], "lambda_eps")
+        && !get_double_field(prhs[3], "lambda_eps", &lambda_eps)) {
+      mexErrMsgTxt("lambda_eps flag has to be a boolean scalar.");
+    }
+  }
+
   vector<vector<bool> > result;
   int emd_cost;
   double amp_sum;
   double final_lambda;
 
-  emd_flow(a, k, emd_budget, &result, &emd_cost, &amp_sum, &final_lambda,
+  emd_flow(a, k, emd_bound_low, emd_bound_high, lambda_high, lambda_eps,
+      &result, &emd_cost, &amp_sum, &final_lambda,
       EMDFlowNetworkFactory::kShortestAugmentingPath, output_function, verbose);
-//      EMDFlowNetworkFactory::kLemonCapacityScaling, output_function, verbose);
 
   if (nlhs >= 1) {
     set_double_matrix(&(plhs[0]), result);

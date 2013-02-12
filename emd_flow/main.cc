@@ -35,12 +35,22 @@ int main(int argc, char** argv)
       ("square_amplitudes", "Square all input amplitudes")
       ("algorithm", po::value<string>(&alg_name)->default_value(
           "shortest-augmenting-path"), "Min-cost max-flow algorithm")
-      ("print_support", po::value<string>(), "Print support to stderr");
+      ("print_support", po::value<string>(), "Print support to stderr")
+      ("emd_interval", po::value<string>(), "Read both lower and upper EMD "
+          "bound from stdin");
   po::variables_map vm;
   po::store(po::parse_command_line(argc, argv, desc), vm);
   po::notify(vm); 
 
-  scanf("%d %d %d %d", &r, &c, &k, &emd_bound);
+  int emd_bound_low = 0;
+  int emd_bound_high = 0;
+
+  scanf("%d %d %d %d", &r, &c, &k, &emd_bound_low);
+  if (vm.count("emd_interval")) {
+    scanf("%d", &emd_bound_high);
+  } else {
+    emd_bound_high = emd_bound_low;
+  }
 
   a.resize(r);
   for (int ii = 0; ii < r; ++ii) {
@@ -72,8 +82,8 @@ int main(int argc, char** argv)
   int emd_cost = 0;
   double amp_sum = 0.0;
   double final_lambda = 0.0;
-  emd_flow(a, k, emd_bound, &result, &emd_cost, &amp_sum, &final_lambda,
-      alg_type, output_function, true);
+  emd_flow(a, k, emd_bound_low, emd_bound_high, 0.1, 0.0001, &result, &emd_cost,
+      &amp_sum, &final_lambda, alg_type, output_function, true);
 
   if (vm.count("print_support")) {
     for (int jj = 0; jj < c; ++jj) {
