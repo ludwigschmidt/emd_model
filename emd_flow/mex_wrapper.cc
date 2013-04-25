@@ -61,7 +61,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     if (!get_fields(prhs[3], &options)) {
       mexErrMsgTxt("Cannot get fields from options argument.");
     }
-    mexPrintf("Got %u options\n", options.size());
     for (size_t ii = 0; ii < options.size(); ++ii) {
       if (known_options.find(options[ii]) == known_options.end()) {
         const size_t tmp_size = 1000;
